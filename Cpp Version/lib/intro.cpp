@@ -1,7 +1,7 @@
 #include "intro.hpp"
 #include <iostream>
 #include <chrono>
-#include <windows.h>
+#include <sy
 
 int Introduction::display_1() {
     id = 1; 
