@@ -1,0 +1,2 @@
+# Format database for each user 
+{code}(string),{type_of_deal}(bool),{partner_name}(string),{partner_phone_number}(string),{size_of_item_list}(int),{name_of_item}(string),{weigth_of_item}(int),{isfragile}(bool),{price}(int)
