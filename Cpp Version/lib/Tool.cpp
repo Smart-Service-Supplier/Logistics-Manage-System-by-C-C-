@@ -127,6 +127,9 @@ int check_deal(std::string &deal, std::string phone_number) {
     while (std::getline(myfile, line)) {
         current_line ++;
         std::vector<std::string> extract = splitString(line, ','); 
+        std::cout << extract[0] << " " << extract[0].length() << std::endl; 
+        std::cout << deal << " " << deal.length() << std::endl;
+
         if (stringCompare(extract[0], deal)) {
             myfile.close();
             return current_line;

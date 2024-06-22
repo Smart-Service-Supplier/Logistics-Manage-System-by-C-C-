@@ -153,6 +153,7 @@ void Deal::Self_delete() {
         }
     }
     if (valid == true) deleteLine(filename, delete_line);
+
     if (this->type == false) {
         valid = false; 
         std::string filename = DATABASE_PATH + this->sender->getPhoneNumber() + ".csv";
@@ -203,7 +204,7 @@ void User::setPassword(std::string password) {
 //     mydeal->address = new Address("Ba Dinh", "Hanoi", "Dien Bien", "Cao Ba Quat", "So 3");
 //     mydeal->sender = new BasicUser("Nguyen Cao Minh", "0336122004");
 //     mydeal->receiver = new BasicUser("Cao Minh Junior", "0336122006");
-//     mydeal->type = true; 
+//     mydeal->type = false; 
 //     mydeal->fee = 1314000;
     
 //     Item* item = new Item("Heart", 1314);
@@ -215,8 +216,8 @@ void User::setPassword(std::string password) {
 //     mydeal->status = FINISHED;
     
 //     mydeal->display();
-//     mydeal->Self_update();
-//     // mydeal->Self_delete();
+//     // mydeal->Self_update();
+//     mydeal->Self_delete();
 
 //     std::string a = "12122004"; 
 //     std::string b = "12122005";

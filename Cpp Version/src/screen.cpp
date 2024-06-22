@@ -349,7 +349,7 @@ void Screen::display_send_deal_list(User *admin) {
         deal.setCode(line[0]);
         deal.type = (stoi(line[1]) ? true : false);
 
-        if (deal.type == false) {// receive
+        if (deal.type == false) {// send
             deal.sender->setName(admin->getName());
             deal.sender->setPhoneNumber(admin->getPhoneNumber());
 
@@ -385,7 +385,7 @@ void Screen::display_send_deal_list(User *admin) {
         return;
     }
     // Showing
-    std::cout << "List of receiving-deal codes:\n";
+    std::cout << "List of sending-deal codes:\n";
     for (int i = 0; i < list.size(); i++) {
         std::cout << i + 1 << ". " << list[i].getCode() << std::endl;
     }
@@ -460,12 +460,15 @@ void Screen::display_deal_action(User* admin) {
         this->id = MANAGE_DEAL;
         return;
     }
-    
+
+    for(int i = 0; i < list.size(); i++) std::cout << list[i].getCode() << std::endl;
+    Sleep(10000);
+
     std::cout << "Enter Code of the deal to delete: ";
-    std::cin.ignore();
     getline(std::cin, buffer);
     stringClean(buffer);
     
+
     int line = check_deal(buffer, admin->getPhoneNumber());
     if (line == 0) {
         std::cout << "Invalid deal code !!!";
@@ -478,6 +481,8 @@ void Screen::display_deal_action(User* admin) {
             std::string temp = list[i].getCode();
             if(stringCompare(buffer, temp)) {
                 list[0].Self_delete();
+                std::cout << "Delete deal " << temp << " successfully" << std::endl;
+                Sleep(3000);
                 this->id = MANAGE_DEAL;
                 return; 
             }
