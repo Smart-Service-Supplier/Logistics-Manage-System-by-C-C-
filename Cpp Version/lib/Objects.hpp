@@ -36,6 +36,8 @@ enum DealStatus {
     FINISHED
 };
 
+const std::string STATUS[7] = {"PROCESSING", "ACCEPTED", "ITEMS TAKEN", "DELIVERING", "ARRIVED", "FINISHED"};
+
 class Deal {
     private: 
         std::string code; 
@@ -54,6 +56,7 @@ class Deal {
 
         void Self_update();
         void Self_delete();
+        void Self_update_status();
 
         void display();
 

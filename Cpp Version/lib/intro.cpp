@@ -9,7 +9,7 @@ int Intro::display_1() {
 
     std::string buffer; 
     while (std::getline(ifs, buffer)) {
-        std::cout << buffer;
+        std::cout << buffer << std::endl; 
         Sleep(50);
     }
     std::cout << std::endl;

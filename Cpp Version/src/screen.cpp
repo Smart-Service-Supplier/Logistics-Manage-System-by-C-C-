@@ -30,7 +30,8 @@ void Screen::display_login(User* user) {
         std::cout << "Enter password: "; 
         std::cin >> Password;
         if (Password[Password.length() - 1] == '\n') Password.pop_back();
-        if (check_password(Password, line_num) == false) {
+
+        if (check_password(Password, line_num) == false) {// IF ENTER WRONG PASSWORD, GOBACK TO LOGIN PAGE
             this->id = LOGIN; 
             std::cout << "INVALID PASSWORD !!!\n";
             Sleep(3000);
@@ -39,6 +40,7 @@ void Screen::display_login(User* user) {
 
         this->id = HOME; 
 
+        // AFTER LOGIN SUCCESSFULLY, READ USER DATA TO VARIABLE "user"
         std::string dataname = "Userdata.csv";
         std::string filename = DATABASE_PATH + dataname; 
         std::ifstream myfile(filename); 
@@ -60,6 +62,7 @@ void Screen::display_login(User* user) {
                 user->address.address_in_detail = extract[8];
             }
         }
+        // FINISH READING DATA 
         
     }
     else this->id = CRE_USER;
@@ -150,6 +153,7 @@ void Screen::display_home() {// main screen
 // Create a new deal
 void Screen::display_customer_input(Deal *deal) {
     std::cout << "Creating a new deal ..." << std::endl;
+
     std::string code_deal = generate_code();
     deal->setCode(code_deal);
 
@@ -157,7 +161,7 @@ void Screen::display_customer_input(Deal *deal) {
     
     std::cout << "Enter the receiver: " << std::endl;
     
-    std::string buffer;
+    std::string buffer; // Read data from keyboard
 
     std::cout << "Receiver name: ";
     getline(std::cin, buffer);
@@ -203,10 +207,11 @@ void Screen::display_item_input(Deal *deal) {
     std::cout << "Creating a new deal ..." << std::endl;
     std::cout << "Enter List of items: " << std::endl;
     std::cout << "Number of items: " << std::endl;
+
     int quantity; 
     std::cin >> quantity;
     std::cin.ignore();
-
+    
     std::string buffer; 
 
     for (int i = 0; i < quantity; i++) {
@@ -235,11 +240,14 @@ void Screen::display_item_input(Deal *deal) {
     }
 
     deal->fee = 50200;
+    deal->status = PROCESSING;
 
     this->clear();
     deal->display();
     deal->Self_update();
-    Sleep(5000);
+
+    std::cout << "\nCreate a new deal successfully\nPress any key to continue!" << std::endl;
+    getchar();
 
     this->id = HOME;
 }
@@ -271,13 +279,14 @@ void Screen::display_recv_deal_list(User *admin) {
 
     std::string filename = DATABASE_PATH + admin->getPhoneNumber() + ".csv";
     std::ifstream myfile(filename);
-    while (getline(myfile, buffer)) {// read data 
+
+    while (getline(myfile, buffer)) {// READ THE DATA OF RECEIVING DEAL FROM DATABASE 
         std::vector<std::string> line = splitString(buffer,',');
         Deal deal;
         deal.setCode(line[0]);
         deal.type = (stoi(line[1]) ? true : false);
 
-        if (deal.type == true) {// receive
+        if (deal.type == true) {// READONLY THE RECEIVING DEAL
             deal.receiver->setName(admin->getName());
             deal.receiver->setPhoneNumber(admin->getPhoneNumber());
 
@@ -286,14 +295,16 @@ void Screen::display_recv_deal_list(User *admin) {
         }
         else continue; 
 
+        // READ ITEMS
         int j = 5; 
         for (int i = 0; i < stoi(line[4]); i++) {
             Item temp(line[j], stod(line[j+1]));
-            bool b = (stoi(line[j+2]) ? true : false);
+            temp.setIsFragile((stoi(line[j+2]) ? true : false));
             deal.list.push_back(temp);
             j = j + 3;
         }
 
+        //READ ADDRESS
         deal.address->address_in_detail = line[j]; j++;
         deal.address->street_name = line[j]; j++;
         deal.address->ward = line[j]; j++;
@@ -330,26 +341,28 @@ void Screen::display_recv_deal_list(User *admin) {
         if(stringCompare(buffer, temp)) {
             this->clear();
             list[i].display();
+            list[i].Self_update_status();
             getchar();
             this->id = MANAGE_DEAL;
             return;
         }
     }
 }
+
 void Screen::display_send_deal_list(User *admin) {
     std::vector<Deal> list;
     std::string buffer;
 
     std::string filename = DATABASE_PATH + admin->getPhoneNumber() + ".csv";
     std::ifstream myfile(filename);
-    Debug;
-    while (getline(myfile, buffer)) {// read data 
+
+    while (getline(myfile, buffer)) {// READ THE DATA OF SENDING DEAL FROM DATABASE
         std::vector<std::string> line = splitString(buffer,',');
         Deal deal;
         deal.setCode(line[0]);
-        deal.type = (stoi(line[1]) ? true : false);
+        deal.type = ((stoi(line[1]) ? true : false));
 
-        if (deal.type == false) {// send
+        if (deal.type == false) {// READONLY SEDNING DEALS
             deal.sender->setName(admin->getName());
             deal.sender->setPhoneNumber(admin->getPhoneNumber());
 
@@ -358,14 +371,16 @@ void Screen::display_send_deal_list(User *admin) {
         }
         else continue; 
 
+        // READ ITEMS
         int j = 5; 
         for (int i = 0; i < stoi(line[4]); i++) {
             Item temp(line[j], stod(line[j+1]));
-            bool b = (stoi(line[j+2]) ? true : false);
+            temp.setIsFragile((stoi(line[j+2]) ? true : false));
             deal.list.push_back(temp);
             j = j + 3;
         }
 
+        // READ ADDRESS
         deal.address->address_in_detail = line[j]; j++;
         deal.address->street_name = line[j]; j++;
         deal.address->ward = line[j]; j++;
@@ -384,6 +399,7 @@ void Screen::display_send_deal_list(User *admin) {
         this->id = MANAGE_DEAL;
         return;
     }
+
     // Showing
     std::cout << "List of sending-deal codes:\n";
     for (int i = 0; i < list.size(); i++) {
@@ -400,6 +416,7 @@ void Screen::display_send_deal_list(User *admin) {
         if(stringCompare(buffer, temp)) {
             this->clear();
             list[i].display();
+            list[i].Self_update_status();
             getchar();
             this->id = MANAGE_DEAL;
             return;
@@ -413,20 +430,20 @@ void Screen::display_deal_action(User* admin) {
 
     std::string filename = DATABASE_PATH + admin->getPhoneNumber() + ".csv";
     std::ifstream myfile(filename);
-    while (getline(myfile, buffer)) {// read data 
+    while (getline(myfile, buffer)) {// READ DATA 
         std::vector<std::string> line = splitString(buffer,',');
         Deal deal;
         deal.setCode(line[0]);
         deal.type = (stoi(line[1]) ? true : false);
 
-        if (deal.type == false) {// receive
+        if (deal.type == false) {// SENDING
             deal.sender->setName(admin->getName());
             deal.sender->setPhoneNumber(admin->getPhoneNumber());
 
             deal.receiver->setName(line[2]);
             deal.receiver->setPhoneNumber(line[3]);
         }
-        else {
+        else { // RECEIVING
             deal.receiver->setName(admin->getName());
             deal.receiver->setPhoneNumber(admin->getPhoneNumber());
 
@@ -434,6 +451,7 @@ void Screen::display_deal_action(User* admin) {
             deal.sender->setPhoneNumber(line[3]);
         } 
 
+        // READ ITEMS
         int j = 5; 
         for (int i = 0; i < stoi(line[4]); i++) {
             Item temp(line[j], stod(line[j+1]));
@@ -442,6 +460,7 @@ void Screen::display_deal_action(User* admin) {
             j = j + 3;
         }
 
+        // READ ADDRESS
         deal.address->address_in_detail = line[j]; j++;
         deal.address->street_name = line[j]; j++;
         deal.address->ward = line[j]; j++;
@@ -454,6 +473,7 @@ void Screen::display_deal_action(User* admin) {
         list.push_back(deal);
     }
     myfile.close();
+
     if(list.empty()) {
         std::cout << "There is no deal" << std::endl;
         Sleep(3000);
@@ -461,8 +481,8 @@ void Screen::display_deal_action(User* admin) {
         return;
     }
 
-    for(int i = 0; i < list.size(); i++) std::cout << list[i].getCode() << std::endl;
-    Sleep(10000);
+    // for(int i = 0; i < list.size(); i++) std::cout << list[i].getCode() << std::endl;
+    // Sleep(10000);
 
     std::cout << "Enter Code of the deal to delete: ";
     getline(std::cin, buffer);
@@ -472,11 +492,11 @@ void Screen::display_deal_action(User* admin) {
     int line = check_deal(buffer, admin->getPhoneNumber());
     if (line == 0) {
         std::cout << "Invalid deal code !!!";
-        Sleep(2000);
+        Sleep(3000);
         this->id = MANAGE_DEAL; 
         return;
     }
-    else {
+    else {// IF THE DEAL EXISTS, DELETE THE DEAL
         for (int i = 0; i < list.size(); i++) {
             std::string temp = list[i].getCode();
             if(stringCompare(buffer, temp)) {
@@ -495,7 +515,6 @@ void Screen::display_deal_action(User* admin) {
 // Edit User Information
 void Screen::display_edit_infor(User *admin) {
     std::string buffer;
-    std::cin.ignore();
     std::cout << "Changing password..." << std::endl;
     std::cout << "Please enter your current password: ";
     getline(std::cin, buffer);
@@ -509,11 +528,42 @@ void Screen::display_edit_infor(User *admin) {
         getline(std::cin, buffer);
 
         if (stringCompare(buffer, temp)) {
-            std::cout << "Change password successful"; 
+            std::string name = "Userdata.csv";
+            std::string data_user = DATABASE_PATH + name; 
+            std::ifstream fAccount(data_user);
+
+            std::string account = admin->getAccount();
+            int line_of_user = check_user(account);
+
+            std::vector<std::string> lines;
+            std::string buffer;  
+            int i = 0; 
+            while(getline(fAccount, buffer)) {
+                i++; 
+                if (i == line_of_user) {
+                    std::vector<std::string> extract = splitString(buffer, ',');
+                    extract[1] = temp;
+                    buffer = "";
+                    for (int i = 0; i < extract.size(); i++) buffer += extract[i] + ',';
+                    buffer.pop_back(); // delete the last ','
+                }
+                lines.push_back(buffer);
+            }
+            fAccount.close();
+
+            std::ofstream edited_fAcc;
+            edited_fAcc.open(data_user, std::ios_base::out);
+            for (int i = 0; i < lines.size(); i++) edited_fAcc << lines[i] << std::endl; 
+
+            std::cout << "Change password successfully";
+            Sleep(3000); 
+
             this->id = HOME; 
 
         } 
         else {
+            std::cout << "Confirm password failed";
+            Sleep(3000);
             this->id = EDIT_INFOR;
             return; 
         }

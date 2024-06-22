@@ -4,15 +4,13 @@
 int main(int argc, char **argv) {
     Screen *scr = new Screen(LOGIN); 
 
-    while (true) {
-        Intro *e = new Intro;  
-        e->loading(); 
-        e->display_1();
-        e->loading();
-        scr->clear();
-        delete e; 
-        break; 
-    }
+    Intro *e = new Intro;  
+    e->loading(); 
+    e->display_1();
+    Sleep(3000);
+    scr->clear();
+    delete e; 
+        
     User* admin = new User;
     Deal* deal = new Deal; 
 
@@ -26,6 +24,7 @@ int main(int argc, char **argv) {
             scr->clear();
         }
         else if (scr->id == HOME) {
+            std::cout << "Dear " << admin->getName() << std::endl;
             scr->display_home();
             // send->sender->setName(admin->getName());
             // send->sender->setPhoneNumber(admin->getPhoneNumber());

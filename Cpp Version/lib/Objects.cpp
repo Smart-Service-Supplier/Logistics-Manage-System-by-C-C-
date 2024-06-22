@@ -55,8 +55,10 @@ void Deal::display() {
     
     std::cout << "To: " << this->address->address_in_detail << ", " << this->address->street_name << ", " << this->address->ward << ", " << this->address->province
         << ", " << this->address->city << std::endl; 
-    
-    std::cout << "Fee: " << this->fee << std::endl;
+
+    std::cout << "Fee: " << this->fee << " VND" << std::endl << std::endl;
+
+    std::cout << "THE STATUS OF THE DEAL: " << STATUS[(int)this->status] << std::endl;
 }
 /*
 bool type; 
@@ -176,6 +178,69 @@ void Deal::Self_delete() {
     }
 }
 
+void Deal::Self_update_status() {
+    std::string code = this->code;
+
+    std::string filename1 = DATABASE_PATH + this->receiver->getPhoneNumber() + ".csv";
+    std::string filename2 = DATABASE_PATH + this->sender->getPhoneNumber() + ".csv";
+
+    int line_send = check_deal(code, this->sender->getPhoneNumber());
+    int line_recv = check_deal(code, this->receiver->getPhoneNumber());
+
+    std::vector<std::string> lines;
+    std::string buffer;  
+
+    // Update status on sender side
+    int i = 0; 
+    std::ifstream file2(filename2);
+    while(getline(file2, buffer)) {
+        i++; 
+        if (i == line_send) {
+            std::vector<std::string> extract = splitString(buffer, ',');
+            DealStatus new_state = ((DealStatus)(stoi(extract[extract.size() - 1])) == FINISHED) ? FINISHED : DealStatus(stoi(extract[extract.size() - 1]) + 1);
+
+            buffer = "";
+            buffer.push_back((int)new_state + '0');
+            extract[extract.size() - 1] = buffer; 
+
+            buffer = "";
+            for (int i = 0; i < extract.size(); i++) buffer += extract[i] + ',';
+            buffer.pop_back(); // delete the last ','
+        }
+        lines.push_back(buffer);
+    }
+    file2.close();
+
+    std::ofstream edited_sender;
+    edited_sender.open(filename2, std::ios_base::out);
+    for (int i = 0; i < lines.size(); i++) edited_sender << lines[i] << std::endl; 
+
+    // Update Status on receiver side 
+    i = 0; 
+    std::ifstream file1(filename1);
+    while(getline(file1, buffer)) {
+        i++; 
+        if (i == line_send) {
+            std::vector<std::string> extract = splitString(buffer, ',');
+            DealStatus new_state = ((DealStatus)(stoi(extract[extract.size() - 1])) == FINISHED) ? FINISHED : DealStatus(stoi(extract[extract.size() - 1]) + 1);
+
+            buffer = "";
+            buffer.push_back((int)new_state + '0');
+            extract[extract.size() - 1] = buffer; 
+
+            buffer = "";
+            for (int i = 0; i < extract.size(); i++) buffer += extract[i] + ',';
+            buffer.pop_back(); // delete the last ','
+        }
+        lines.push_back(buffer);
+    }
+    file2.close();
+
+    std::ofstream edited_receiver;
+    edited_receiver.open(filename1, std::ios_base::out);
+    for (int i = 0; i < lines.size(); i++) edited_receiver << lines[i] << std::endl; 
+}
+
 // End Deal class
 
 // Methods for User class
@@ -196,6 +261,11 @@ void User::setPassword(std::string password) {
     this->password = password;
 }
 // End User class
+
+
+
+
+
 // int main () {
 //     Deal* mydeal = new Deal;
 //     mydeal->setCode("12122004");

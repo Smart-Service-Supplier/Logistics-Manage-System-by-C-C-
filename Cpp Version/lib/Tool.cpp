@@ -103,9 +103,9 @@ bool check_password(std::string &password, int line_num) {
         current_line ++;
         if (current_line == line_num) {
             std::vector<std::string> extract = splitString(line, ',');
-            std::cout << password << std::endl;
-            std::cout << extract[1] << std::endl;
-            std::cout << password.length() << " " << extract[1].length() <<std::endl;
+            // std::cout << password << std::endl;
+            // std::cout << extract[1] << std::endl;
+            // std::cout << password.length() << " " << extract[1].length() <<std::endl;
             if(stringCompare(extract[1], password)) return true; 
             else return false; 
         }
@@ -127,8 +127,8 @@ int check_deal(std::string &deal, std::string phone_number) {
     while (std::getline(myfile, line)) {
         current_line ++;
         std::vector<std::string> extract = splitString(line, ','); 
-        std::cout << extract[0] << " " << extract[0].length() << std::endl; 
-        std::cout << deal << " " << deal.length() << std::endl;
+        // std::cout << extract[0] << " " << extract[0].length() << std::endl; 
+        // std::cout << deal << " " << deal.length() << std::endl;
 
         if (stringCompare(extract[0], deal)) {
             myfile.close();
