@@ -36,7 +36,7 @@ enum DealStatus {
     FINISHED
 };
 
-const std::string STATUS[7] = {"PROCESSING", "ACCEPTED", "ITEMS TAKEN", "DELIVERING", "ARRIVED", "FINISHED"};
+const std::string STATUS[7] = {"PROCESSING", "ACCEPTED", "ITEMS TAKEN", "IN_STOCK", "DELIVERING", "ARRIVED", "FINISHED"};
 
 class Deal {
     private: 
